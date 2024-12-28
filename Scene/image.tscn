@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://bclbnt12aw4g8"]
+
+[ext_resource type="Texture2D" uid="uid://b7dlhn7uxqj5w" path="res://Sprites/ball_blue.png" id="1_imeau"]
+[ext_resource type="Script" path="res://Script/image.gd" id="1_lsxhm"]
+
+[node name="Image" type="Node2D"]
+script = ExtResource("1_lsxhm")
+image = ExtResource("1_imeau")

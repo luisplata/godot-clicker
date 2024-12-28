@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://d4d4u5p3vx3ff"]
+
+[ext_resource type="Script" path="res://Script/image.gd" id="1_1bwuw"]
+[ext_resource type="Texture2D" uid="uid://71bgx00k7se0" path="res://Sprites/bola amarilla.png" id="2_5me2n"]
+
+[node name="yellow" type="Node2D"]
+script = ExtResource("1_1bwuw")
+image = ExtResource("2_5me2n")
+addCount = 3

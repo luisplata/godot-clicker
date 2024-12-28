@@ -1,0 +1,52 @@
+[gd_scene load_steps=10 format=3 uid="uid://dkgi82ivbjmc3"]
+
+[ext_resource type="Texture2D" uid="uid://b7dlhn7uxqj5w" path="res://Sprites/ball_blue.png" id="1_76alh"]
+[ext_resource type="Script" path="res://Script/game.gd" id="1_xukdl"]
+[ext_resource type="PackedScene" uid="uid://yfq41fs48wl8" path="res://Scene/ImagesCustoms/blue.tscn" id="2_ggpk8"]
+[ext_resource type="Script" path="res://Script/label.gd" id="3_6txnk"]
+[ext_resource type="PackedScene" uid="uid://deln083jefguv" path="res://Scene/ImagesCustoms/red.tscn" id="3_xudx3"]
+[ext_resource type="PackedScene" uid="uid://d4d4u5p3vx3ff" path="res://Scene/ImagesCustoms/yellow.tscn" id="4_7daof"]
+[ext_resource type="Script" path="res://Script/buttonReal.gd" id="4_o6h3a"]
+[ext_resource type="Texture2D" uid="uid://c2cxywy2l3ajy" path="res://Sprites/kenney_pixel-platformer/SampleA.png" id="5_3g2rf"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_sukdg"]
+font_size = 30
+
+[node name="Game" type="Node2D"]
+script = ExtResource("1_xukdl")
+images = Array[PackedScene]([ExtResource("2_ggpk8"), ExtResource("3_xudx3"), ExtResource("4_7daof")])
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(222, -95)
+scale = Vector2(2.79031, 3.46553)
+texture = ExtResource("5_3g2rf")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="Art" type="Sprite2D" parent="Camera2D"]
+scale = Vector2(1.47115, 1.47115)
+texture = ExtResource("1_76alh")
+
+[node name="Label" type="Label" parent="Camera2D"]
+offset_left = -359.0
+offset_top = -619.0
+offset_right = 361.0
+offset_bottom = -557.0
+text = "999999999999999999999999999999999999999999"
+label_settings = SubResource("LabelSettings_sukdg")
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("3_6txnk")
+
+[node name="Button" type="Button" parent="Camera2D"]
+offset_left = -359.0
+offset_top = -355.0
+offset_right = 358.0
+offset_bottom = 382.0
+focus_mode = 0
+theme_type_variation = &"FlatButton"
+button_mask = 7
+flat = true
+script = ExtResource("4_o6h3a")
+
+[connection signal="button_down" from="Camera2D/Button" to="Camera2D/Button" method="click"]
