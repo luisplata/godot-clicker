@@ -1,7 +1,7 @@
 class_name GameRules
 
 extends Node2D
-
+# Doc of big numbers
 # https://github.com/ChronoDK/GodotBigNumberClass/tree/master
 
 var clickCount : Big = Big.new(0)
