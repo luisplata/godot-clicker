@@ -18,6 +18,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Clean up
+        uses: jlumbroso/free-disk-space@v1.2.0
+        
       - name: Download and setup Godot
         run: |
           wget https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-${GODOT_RELEASE}/Godot_v${GODOT_VERSION}-${GODOT_RELEASE}_linux.x86_64.zip
@@ -50,6 +53,12 @@ jobs:
             cat ~/.config/godot/editor_log.txt
             exit 1
           fi
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        id: get_artifact_id
+        with:
+          name: build-Windows
+          path: build
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
