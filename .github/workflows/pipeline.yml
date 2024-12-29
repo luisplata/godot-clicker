@@ -106,5 +106,5 @@ jobs:
             # Descargar el archivo ZIP
             pwd
             echo "Downloading artifact..."
-            curl -L -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/12345678/zip" -o $HOME/$APP_DIR/Export.zip
+            echo "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/12345678/zip"
+            curl -L -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/12345678/zip" -o $HOME/$APP_DIR/Export.zip
