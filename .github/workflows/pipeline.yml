@@ -93,6 +93,7 @@ jobs:
             echo "Artifact URL: $ARTIFACT_URL"
             echo "Target directory: $APP_DIR"
             echo "Temporary ZIP path: $TEMP_ZIP"
+            pwd
             # Comprobar si APP_DIR existe
             if [ -d "$APP_DIR" ]; then
               echo "APP_DIR exists, cleaning it."
@@ -103,6 +104,7 @@ jobs:
               mkdir -p $APP_DIR
             fi
             # Descargar el archivo ZIP
+            pwd
             echo "Downloading artifact..."
             curl -L $ARTIFACT_URL -o $TEMP_ZIP
             # Verificar si se descargó correctamente
