@@ -39,7 +39,6 @@ jobs:
       - name: Export project
         run: |
           ./godot --headless --export-release "Web" "Export/index.html"
-          fi
           EXIT_CODE=$?
           echo "Godot export exit code: $EXIT_CODE"
           echo "Contents of Export directory:"
