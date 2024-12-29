@@ -53,6 +53,14 @@ jobs:
             cat ~/.config/godot/editor_log.txt
             exit 1
           fi
+
+      - name: Validate Export.zip
+        run: |
+          echo "Listing contents of Export directory:"
+          ls -la Export
+          echo "Checking Export.zip:"
+          ls -la Export.zip || echo "Export.zip not found!"
+
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         id: get_artifact_id
