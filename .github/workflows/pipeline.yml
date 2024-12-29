@@ -75,12 +75,42 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
           script: |
+            # Definir variables
             APP_DIR=${{ secrets.APP_DIR }}
             ARTIFACT_URL="${{ needs.export-and-deploy.outputs.artifact_url }}"
             TEMP_ZIP="$APP_DIR/Export.zip"
+            # Imprimir variables
+            echo "Artifact URL: $ARTIFACT_URL"
+            echo "Target directory: $APP_DIR"
+            echo "Temporary ZIP path: $TEMP_ZIP"
+            # Comprobar si APP_DIR existe
+            if [ -d "$APP_DIR" ]; then
+              echo "APP_DIR exists, cleaning it."
+              ls -la $APP_DIR
+              rm -rf $APP_DIR/*
+            else
+              echo "APP_DIR does not exist. Creating it."
+              mkdir -p $APP_DIR
+            fi
             # Descargar el archivo ZIP
+            echo "Downloading artifact..."
             curl -L $ARTIFACT_URL -o $TEMP_ZIP
-            # Descomprimir y limpiar
-            rm -rf $APP_DIR/*
+            # Verificar si se descargó correctamente
+            if [ -f "$TEMP_ZIP" ]; then
+              echo "Downloaded ZIP file:"
+              ls -la $TEMP_ZIP
+            else
+              echo "Failed to download ZIP file."
+              exit 1
+            fi
+            # Descomprimir el ZIP
+            echo "Unzipping $TEMP_ZIP into $APP_DIR"
             unzip -o $TEMP_ZIP -d $APP_DIR
+            # Validar el contenido descomprimido
+            echo "Contents of APP_DIR after unzipping:"
+            ls -la $APP_DIR
+            # Eliminar el archivo ZIP
+            echo "Removing temporary ZIP file."
             rm $TEMP_ZIP
+            # Confirmar finalización
+            echo "Deployment completed successfully."
