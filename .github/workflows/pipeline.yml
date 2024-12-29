@@ -86,7 +86,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             # Definir variables
-            APP_DIR=${{ secrets.APP_DIR }}
+            APP_DIR=$HOME/${{ secrets.APP_DIR }}
             ARTIFACT_URL="${{ needs.export-and-deploy.outputs.artifact_url }}"
             TEMP_ZIP="$APP_DIR/Export.zip"
             # Imprimir variables
