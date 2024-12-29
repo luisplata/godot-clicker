@@ -106,23 +106,5 @@ jobs:
             # Descargar el archivo ZIP
             pwd
             echo "Downloading artifact..."
-            curl -L $ARTIFACT_URL -o $TEMP_ZIP
-            # Verificar si se descargó correctamente
-            if [ -f "$TEMP_ZIP" ]; then
-              echo "Downloaded ZIP file:"
-              ls -la $TEMP_ZIP
-            else
-              echo "Failed to download ZIP file."
-              exit 1
-            fi
-            # Descomprimir el ZIP
-            echo "Unzipping $TEMP_ZIP into $APP_DIR"
-            unzip -o $TEMP_ZIP -d $APP_DIR
-            # Validar el contenido descomprimido
-            echo "Contents of APP_DIR after unzipping:"
-            ls -la $APP_DIR
-            # Eliminar el archivo ZIP
-            echo "Removing temporary ZIP file."
-            rm $TEMP_ZIP
-            # Confirmar finalización
-            echo "Deployment completed successfully."
+            curl -L -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/12345678/zip" -o $HOME/$APP_DIR/Export.zip
