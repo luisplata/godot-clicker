@@ -63,17 +63,10 @@ jobs:
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
-        id: get_artifact_id
-        with:
-          name: build-Windows
-          path: build
-
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
         id: upload_artifact
         with:
           name: build-Web
-          path: Export.zip
+          path: Export/Export.zip
 
       - name: Generate Artifact URL
         id: generate_artifact
