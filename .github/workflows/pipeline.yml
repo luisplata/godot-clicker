@@ -95,13 +95,18 @@ jobs:
             echo "Target directory: $APP_DIR"
             echo "Temporary ZIP path: $TEMP_ZIP"
 
-            # Comprobar si APP_DIR existe
+            # Imprimir detalles para descargar manualmente el ZIP
+            echo "To download the artifact manually, run the following command:"
+            echo "curl -L -H \"Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}\" \"$ARTIFACT_URL\" -o Export.zip"
+            echo "Alternatively, open this URL in your browser:"
+            echo "$ARTIFACT_URL"
+
+            # Limpiar el directorio si existe
             if [ -d "$APP_DIR" ]; then
-              echo "APP_DIR exists, cleaning it."
-              ls -la "$APP_DIR"
+              echo "Cleaning APP_DIR..."
               rm -rf "${APP_DIR:?}/*"
             else
-              echo "APP_DIR does not exist. Creating it."
+              echo "Creating APP_DIR..."
               mkdir -p "$APP_DIR"
             fi
 
@@ -109,6 +114,10 @@ jobs:
             echo "Downloading artifact..."
             curl -L -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
               "$ARTIFACT_URL" -o "$TEMP_ZIP"
+
+            # Verificar el contenido del ZIP descargado
+            echo "Checking ZIP contents..."
+            unzip -l "$TEMP_ZIP"
 
             # Comprobar si la descarga fue exitosa
             if [ $? -ne 0 ]; then
@@ -119,3 +128,7 @@ jobs:
             # Descomprimir el archivo en APP_DIR
             echo "Extracting ZIP..."
             unzip -o "$TEMP_ZIP" -d "$APP_DIR"
+
+            # Eliminar el ZIP para evitar conflictos futuros
+            echo "Deleting ZIP..."
+            rm -f "$TEMP_ZIP"
