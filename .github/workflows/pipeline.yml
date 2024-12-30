@@ -65,7 +65,7 @@ jobs:
         uses: actions/upload-artifact@v4
         id: upload_artifact
         with:
-          name: Export
+          name: Exported_Web_Build
           path: Export
 
       - name: Generate Artifact URL
