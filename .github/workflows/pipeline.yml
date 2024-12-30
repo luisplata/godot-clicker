@@ -86,26 +86,36 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             # Definir variables
-            APP_DIR=$HOME/${{ secrets.APP_DIR }}
+            APP_DIR="${HOME}/${{ secrets.APP_DIR }}"
             ARTIFACT_URL="${{ needs.export-and-deploy.outputs.artifact_url }}"
             TEMP_ZIP="$APP_DIR/Export.zip"
+            
             # Imprimir variables
             echo "Artifact URL: $ARTIFACT_URL"
             echo "Target directory: $APP_DIR"
             echo "Temporary ZIP path: $TEMP_ZIP"
-            pwd
+
             # Comprobar si APP_DIR existe
             if [ -d "$APP_DIR" ]; then
               echo "APP_DIR exists, cleaning it."
-              ls -la $APP_DIR
-              rm -rf $APP_DIR/*
+              ls -la "$APP_DIR"
+              rm -rf "${APP_DIR:?}/*"
             else
               echo "APP_DIR does not exist. Creating it."
-              mkdir -p $APP_DIR
+              mkdir -p "$APP_DIR"
             fi
+
             # Descargar el archivo ZIP
-            pwd
             echo "Downloading artifact..."
-            echo "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"
-            echo "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/12345678/zip"
-            curl -L -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/12345678/zip" -o $HOME/$APP_DIR/Export.zip
+            curl -L -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              "$ARTIFACT_URL" -o "$TEMP_ZIP"
+
+            # Comprobar si la descarga fue exitosa
+            if [ $? -ne 0 ]; then
+              echo "Failed to download artifact."
+              exit 1
+            fi
+
+            # Descomprimir el archivo en APP_DIR
+            echo "Extracting ZIP..."
+            unzip -o "$TEMP_ZIP" -d "$APP_DIR"
