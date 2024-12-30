@@ -10,19 +10,24 @@ env:
   GODOT_RELEASE: stable
 
 jobs:
-  export:
+  export-and-deploy:
     runs-on: ubuntu-latest
+    outputs:
+      artifact_url: ${{ steps.generate_artifact.outputs.artifact_url }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Clean up
+        uses: jlumbroso/free-disk-space@v1.2.0
+        
       - name: Download and setup Godot
         run: |
           wget https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-${GODOT_RELEASE}/Godot_v${GODOT_VERSION}-${GODOT_RELEASE}_linux.x86_64.zip
           unzip Godot_v${GODOT_VERSION}-${GODOT_RELEASE}_linux.x86_64.zip
           mv Godot_v${GODOT_VERSION}-${GODOT_RELEASE}_linux.x86_64 godot
           chmod +x godot
-          
+
       - name: Setup export templates
         run: |
           wget https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-${GODOT_RELEASE}/Godot_v${GODOT_VERSION}-${GODOT_RELEASE}_export_templates.tpz
@@ -30,7 +35,7 @@ jobs:
           unzip Godot_v${GODOT_VERSION}-${GODOT_RELEASE}_export_templates.tpz
           mv templates/* ~/.local/share/godot/export_templates/${GODOT_VERSION}.${GODOT_RELEASE}/
           rm -rf templates
-          
+
       - name: Clear export folder
         run: |
           rm -rf Export
@@ -49,6 +54,29 @@ jobs:
             exit 1
           fi
 
+      - name: Validate Export.zip
+        run: |
+          echo "Listing contents of Export directory:"
+          ls -la Export
+          echo "Checking Export.zip:"
+          ls -la Export.zip || echo "Export.zip not found!"
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        id: upload_artifact
+        with:
+          name: Export
+          path: Export
+
+      - name: Generate Artifact URL
+        id: generate_artifact
+        run: |
+          echo "::set-output name=artifact_url::https://api.github.com/repos/${{ github.repository }}/actions/artifacts/${{ steps.upload_artifact.outputs.artifact-id }}/zip"
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: export-and-deploy
+    steps:
       - name: Clean and deploy
         uses: appleboy/ssh-action@master
         with:
@@ -57,17 +85,37 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            APP_DIR=${{ secrets.APP_DIR }}
-            rm -rf $APP_DIR/*
-            mkdir -p $APP_DIR
+            # Definir variables
+            APP_DIR="${HOME}/${{ secrets.APP_DIR }}"
+            ARTIFACT_URL="${{ needs.export-and-deploy.outputs.artifact_url }}"
+            TEMP_ZIP="$APP_DIR/Export.zip"
+            
+            # Imprimir variables
+            echo "Artifact URL: $ARTIFACT_URL"
+            echo "Target directory: $APP_DIR"
+            echo "Temporary ZIP path: $TEMP_ZIP"
 
-      - name: Upload files to server
-        uses: burnett01/rsync-deployments@7.0.1
-        with:
-          switches: -avz --delete
-          path: Export/
-          remote_path: ${{ secrets.APP_DIR }}
-          remote_host: ${{ secrets.SSH_HOST }}
-          remote_user: ${{ secrets.SSH_USER }}
-          remote_port: ${{ secrets.SSH_PORT }}
-          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+            # Comprobar si APP_DIR existe
+            if [ -d "$APP_DIR" ]; then
+              echo "APP_DIR exists, cleaning it."
+              ls -la "$APP_DIR"
+              rm -rf "${APP_DIR:?}/*"
+            else
+              echo "APP_DIR does not exist. Creating it."
+              mkdir -p "$APP_DIR"
+            fi
+
+            # Descargar el archivo ZIP
+            echo "Downloading artifact..."
+            curl -L -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              "$ARTIFACT_URL" -o "$TEMP_ZIP"
+
+            # Comprobar si la descarga fue exitosa
+            if [ $? -ne 0 ]; then
+              echo "Failed to download artifact."
+              exit 1
+            fi
+
+            # Descomprimir el archivo en APP_DIR
+            echo "Extracting ZIP..."
+            unzip -o "$TEMP_ZIP" -d "$APP_DIR"
