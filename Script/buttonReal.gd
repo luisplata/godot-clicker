@@ -12,5 +12,4 @@ func _process(delta: float) -> void:
 
 
 func click() -> void:
-	print("Click")
 	emit_signal("Click")
